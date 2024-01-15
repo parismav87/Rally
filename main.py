@@ -35,10 +35,15 @@ if sys.platform != "darwin":
     window.fullscreen = True
 else:
     window.size = window.fullscreen_size
+    screen_width, screen_height = window.size
     window.position = Vec2(
-        int((window.screen_resolution[0] - window.fullscreen_size[0]) / 2),
-        int((window.screen_resolution[1] - window.fullscreen_size[1]) / 2)
-    )
+        int((screen_width - window.fullscreen_size[0]) / 2),
+        int((screen_height - window.fullscreen_size[1]) / 2)
+        )
+   # window.position = Vec2(
+   #     int((window.screen_resolution[0] - window.fullscreen_size[0]) / 2),
+   #     int((window.screen_resolution[1] - window.fullscreen_size[1]) / 2)
+   # )
 
 # Starting new thread for assets
 
