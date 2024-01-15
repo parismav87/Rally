@@ -7,7 +7,7 @@ sign = lambda x: -1 if x < 0 else (1 if x > 0 else 0)
 Text.default_resolution = 1080 * Text.size
 
 class Car(Entity):
-    def __init__(self, position = (0, 0, 4), rotation = (0, 0, 0), topspeed = 30, acceleration = 0.35, braking_strength = 30, friction = 0.6, camera_speed = 8, drift_speed = 35):
+    def __init__(self, position = (0, 0, 4), rotation = (0, 0, 0), topspeed = 30, acceleration = 0.35, braking_strength = 30, friction = 0.6, camera_speed = 99, drift_speed = 35):
         super().__init__(
             model = "sports-car.obj",
             texture = "sports-red.png",
@@ -41,7 +41,7 @@ class Car(Entity):
         self.pivot_rotation_distance = 1
 
         # Camera Follow
-        self.camera_angle = "top"
+        self.camera_angle = "behind"
         self.camera_offset = (0, 60, -70)
         self.camera_rotation = 40
         self.camera_follow = False
@@ -465,7 +465,7 @@ class Car(Entity):
                     self.camera_rotation = 40
                 self.camera_offset = (0, 10, -30)
                 self.change_camera = False
-                self.camera_speed = 8
+                self.camera_speed = 99
                 camera.rotation_x = lerp(camera.rotation_x, self.camera_rotation / 3, 2 * time.dt)
                 camera.world_position = lerp(camera.world_position, self.camera_pivot.world_position, time.dt * self.camera_speed / 2)
                 camera.world_rotation_y = lerp(camera.world_rotation_y, self.world_rotation_y, time.dt * self.camera_speed / 2)
