@@ -50,7 +50,7 @@ class Handler(AbstractHandler):
             configuration (Configuration): The configuration to be used for this test run. First item contains the
                 url of the Rally SUT.
         """
-        self.sut = RallyConnection(self, configuration.items[0].value)
+        self.sut = RallyConnection(self, 5555, 5556)
         self.sut.connect()
 
     def reset(self):
