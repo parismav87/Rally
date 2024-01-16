@@ -8,7 +8,7 @@ from time import sleep
 from typing import List
 
 import zmq
-from zmq.eventloop.zmqstream import ZMQStream
+#from zmq.eventloop.zmqstream import ZMQStream
 
 
 # RALLY_PATH = "C:\\Users\Arwin\\PycharmProjects\\Rally" # Used for testing, please change this in a later version!!
@@ -23,30 +23,19 @@ class RallyConnection:
         endpoint (str): URL of the SmartDoor SUT
     """
 
-    def __init__(self, handler, send_port_number, receive_port_number):
+    def __init__(self, handler, port_number=7777):
         self.handler = handler
-        self.send_port_number = send_port_number
-        self.receive_port_number = receive_port_number
-        self.send_ip_address = 'tcp://*:{}'.format(send_port_number)
-        self.receive_ip_address = 'tcp://localhost:{}'.format(receive_port_number)
-        self.context = None
+
         self.process = None
-        self.context = None
-        self.socket = None
+        self.context = zmq.Context()
+        self.socket = self.context.socket(zmq.ROUTER)
+        self.socket.bind(f'tcp://*:{port_number}')
 
     def connect(self):
         """
             Connect to the SmartDoor SUT
         """
         logging.info('Opening a socket for the game')
-
-        self.context = zmq.Context()
-        self.send_socket = self.context.socket(zmq.PUB)
-        self.send_socket.bind(self.send_ip_address)
-
-        self.receive_socket = self.context.socket(zmq.SUB)
-        self.receive_socket.connect(self.receive_ip_address)
-        self.receive_socket.setsockopt_string(zmq.SUBSCRIBE, "")
 
         # make a thread
         self.wst = threading.Thread(target=self.run_forever)
@@ -58,8 +47,8 @@ class RallyConnection:
         # print("Connected to the game")
 
         logging.info('Starting the Rally Game')
-        self.process = subprocess.Popen(f'python main.py {self.send_port_number} {self.receive_port_number}',
-                                        shell=True, stdout=sys.stdout)
+        #self.process = subprocess.Popen('python main.py',
+        #                                shell=True, stdout=sys.stdout)
         # print("Started the game")
         # while True:
         #     self.send_socket.send_string('"w"')
@@ -81,8 +70,14 @@ class RallyConnection:
 
     def run_forever(self):
         while True:
-            message = self.receive_socket.recv_string()
-            self.handler.send_message_to_amp(message)
+            #identity, message = self.socket.recv()
+            identity, message = self.socket.recv_multipart()
+            echo_msg = "w"
+            self.socket.send_multipart([identity, echo_msg.encode()])
+            #self.socket.send_string("w")
+            sleep(2)
+            print (message)
+            #self.handler.send_message_to_amp(message)
 
     def send(self, message):
         """
@@ -93,8 +88,8 @@ class RallyConnection:
         """
         logging.debug('Sending message to SUT: {msg}'.format(msg=message))
 
-        self.send_socket.send_string(message)
-        self.handler.send_message_to_amp(message)
+        self.socket.send_string(message)
+        #self.handler.send_message_to_amp(message)
 
     # def on_open(self):
     #     """
@@ -115,7 +110,7 @@ class RallyConnection:
     #
     #     Args:
     #         msg (str): Message of the SmartDoor SUT
-    #     """
+    #    """
     #     logging.debug('Received message from sut: {msg}'.format(msg=msg))
     # print("We received a message!!!!")
     # self.handler.send_message_to_amp('\n'.join(msg))  # Send an enter separated list to AMP
@@ -154,7 +149,7 @@ class RallyConnection:
 
 
 if __name__ == "__main__":
-    connection = RallyConnection(None, 5555, 5556)
+    connection = RallyConnection(None, 7777)
     connection.connect()
     sleep(60)
     # connection.stop()

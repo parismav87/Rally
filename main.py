@@ -162,13 +162,14 @@ sand_track.enable()
 # Initialize communication
 import sys
 from communication import CommunicationClient, extract_game_state, apply_input
-assert len(sys.argv) == 3
-print(sys.argv)
-receive_port_number = sys.argv[1]
-send_port_number = sys.argv[2]
+#assert len(sys.argv) == 3
+#print(sys.argv)
+#receive_port_number = sys.argv[1]
+#send_port_number = sys.argv[2]
 # print(sys.argv)
 # print("Found port number {}".format(port_number))
-socket_client = CommunicationClient(receive_port_number, send_port_number)
+#socket_client = CommunicationClient(receive_port_number, send_port_number)
+socket_client = CommunicationClient("rally")
 
 def play():
 

@@ -2,34 +2,28 @@ import zmq
 import json
 
 class CommunicationClient:
-    def __init__(self, receive_port_number, transmit_port_number):
+    def __init__(self, identity = "rally"):
         self.context = zmq.Context()
-        self.receive_socket = self.context.socket(zmq.SUB)
-        self.receive_socket.connect('tcp://localhost:{}'.format(receive_port_number))
-        self.receive_socket.setsockopt_string(zmq.SUBSCRIBE, "")
-
-        self.transmit_socket = self.context.socket(zmq.PUB)
-        self.transmit_socket.bind('tcp://*:{}'.format(transmit_port_number))
-
+        self.socket = self.context.socket(zmq.DEALER)
+        self.socket.setsockopt(zmq.IDENTITY, identity.encode())
+        self.socket.connect("tcp://localhost:7777")
+        self.identity = identity
         
     def receive(self):
-        pass
         try:
-            serialized = self.receive_socket.recv_string(flags=zmq.NOBLOCK)
+            serialized = self.socket.recv_string(flags=zmq.NOBLOCK)
+            print ("recv command: ", serialized)
+            return serialized
         except zmq.Again as e:
             return None
-        #serialized = json.dumps('w')
-        # print(serialized)
-        obj = json.loads(serialized)
-        # print("Received reply")
-        # print(obj)
-        return obj
+        #obj = json.loads(serialized)
+        #return obj
         # print(obj)
         
     def send(self, message = None):
         serialized = json.dumps(message)
         # print(serialized)
-        self.transmit_socket.send_string(serialized)
+        self.socket.send_string(serialized + self.identity)
         
 def apply_input(held_keys, external_command):
     if external_command is None:
