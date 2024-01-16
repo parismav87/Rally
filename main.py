@@ -159,6 +159,14 @@ Sky(texture = "sky")
 # main_menu.start()
 sand_track.enable()
 
+# Initialize communication
+import sys
+from communication import CommunicationClient, extract_game_state, apply_input
+assert len(sys.argv) == 2
+socket_port = sys.argv[1]
+print(sys.argv)
+print("Found ip_address {}".format(ip_address))
+socket_client = CommunicationClient(ip_address)
 
 def play():
 
@@ -231,10 +239,13 @@ def play():
 
 
 
-play()
-
+play()    
 
 def update():
+    
+    external_command = socket_client.receive()
+    apply_input(held_keys, external_command)
+    
     # If multiplayer, Call the Multiplayer class
     if car.multiplayer:
         global multiplayer
@@ -268,7 +279,10 @@ def update():
     
     if achievements.time_spent < 10:
         achievements.time_spent += time.dt
-
+        
+    game_state = extract_game_state(car)
+    socket_client.send(game_state)
+        
 def input(key):
     # If multiplayer, send the client's position, rotation, texture, username and highscore to the server
     if car.multiplayer_update:
