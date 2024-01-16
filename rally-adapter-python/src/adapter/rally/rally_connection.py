@@ -28,7 +28,7 @@ class RallyConnection:
         self.send_port_number = send_port_number
         self.receive_port_number = receive_port_number
         self.send_ip_address = 'tcp://*:{}'.format(send_port_number)
-        self.receive_ip_address = 'tcp://*:{}'.format(receive_port_number)
+        self.receive_ip_address = 'tcp://localhost:{}'.format(receive_port_number)
         self.context = None
         self.process = None
         self.context = None
@@ -43,14 +43,23 @@ class RallyConnection:
         self.context = zmq.Context()
         self.send_socket = self.context.socket(zmq.PUB)
         self.send_socket.bind(self.send_ip_address)
+
         self.receive_socket = self.context.socket(zmq.SUB)
-        self.receive_socket.bind(self.receive_ip_address)
+        self.receive_socket.connect(self.receive_ip_address)
+        self.receive_socket.setsockopt_string(zmq.SUBSCRIBE, "")
         self.stream = ZMQStream(self.receive_socket)
         self.stream.on_recv(self.on_message)
         # print("Connected to the game")
 
         logging.info('Starting the Rally Game')
         self.process = subprocess.Popen(f'python main.py {self.send_port_number} {self.receive_port_number}', shell=True, stdout=sys.stdout)
+        print("Started the game")
+        while True:
+            print("Received a message")
+            message = self.receive_socket.recv()
+            print(message)
+            # self.handler.send_message_to_amp(message)
+
         # self.process = subprocess.Popen('python main.py', shell=True)
         # print("Starting!")
 
@@ -95,7 +104,7 @@ class RallyConnection:
             msg (str): Message of the SmartDoor SUT
         """
         logging.debug('Received message from sut: {msg}'.format(msg=msg))
-        print("We received a message!!!!")
+        # print("We received a message!!!!")
         # self.handler.send_message_to_amp('\n'.join(msg))  # Send an enter separated list to AMP
         print(msg)
 
@@ -132,7 +141,7 @@ class RallyConnection:
 
 
 if __name__ == "__main__":
-    connection = RallyConnection(None, 8080, 8081)
+    connection = RallyConnection(None, 5555, 5556)
     connection.connect()
     sleep(60)
     # connection.stop()

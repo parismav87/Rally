@@ -6,9 +6,10 @@ class CommunicationClient:
         self.context = zmq.Context()
         self.receive_socket = self.context.socket(zmq.SUB)
         self.receive_socket.connect('tcp://localhost:{}'.format(receive_port_number))
+        self.receive_socket.setsockopt_string(zmq.SUBSCRIBE, "")
 
         self.transmit_socket = self.context.socket(zmq.PUB)
-        self.transmit_socket.connect('tcp://localhost:{}'.format(int(transmit_port_number)+1))
+        self.transmit_socket.bind('tcp://*:{}'.format(transmit_port_number))
 
         
     def receive(self):
