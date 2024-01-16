@@ -81,7 +81,7 @@ class RallyConnection:
 
     def run_forever(self):
         while True:
-            message = self.receive_socket.recv()
+            message = self.receive_socket.recv_string()
             self.handler.send_message_to_amp(message)
 
     def send(self, message):
