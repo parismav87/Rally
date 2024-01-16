@@ -102,7 +102,7 @@ class Handler(AbstractHandler):
             _stimulus('forward_left'),
             _stimulus('backward_right'),
             _stimulus('backward_left'),
-            _response('coordinates'),
+            _response('game_state', parameters=[Parameter('state', Type.STRUCT)]),
             #_stimulus('lock', parameters=[Parameter('passcode', Type.INTEGER)]),
         ]
 
