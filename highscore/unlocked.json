@@ -1,7 +1,7 @@
 {
     "tracks": {
         "sand_track": true,
-        "grass_track": false,
+        "grass_track": true,
         "snow_track": false,
         "forest_track": false,
         "savannah_track": false,
@@ -20,7 +20,7 @@
         "muscle_car": false,
         "limo": false,
         "lorry": false,
-        "hatchback": false,
+        "hatchback": true,
         "rally_car": false
     },
     "textures": {

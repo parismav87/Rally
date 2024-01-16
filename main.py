@@ -156,6 +156,84 @@ main_menu.sun = sun
 # Sky
 Sky(texture = "sky")
 
+# main_menu.start()
+sand_track.enable()
+
+
+def play():
+
+    car.multiplayer = False
+    main_menu.start_menu.disable()
+    # main_menu.main_menu.enable()
+    grass_track.enable()
+    main_menu.car.position = (0, 0, 4)
+    main_menu.car.visible = False
+    for track in main_menu.tracks:
+        for i in track.track:
+            i.disable()
+        for i in track.details:
+            i.disable()
+    for track in main_menu.grass_track.track:
+        track.enable()
+    if main_menu.car.graphics != "ultra fast":
+        for detail in main_menu.grass_track.details:
+            detail.enable()
+    if main_menu.car.graphics == "fast":
+        main_menu.grass_track.grass.disable()
+
+    main_menu.car.visible = True
+    mouse.locked = True
+    main_menu.maps_menu.disable()
+    main_menu.car.position = (-63, -30, -7)
+    main_menu.car.rotation = (0, 90, 0)
+    main_menu.car.reset_count_timer.enable()
+            
+    for track in main_menu.tracks:
+        track.disable()
+        for i in track.track:
+            i.disable()
+        for i in track.details:
+            i.disable()
+
+
+    main_menu.race_menu.disable()
+    # main_menu.maps_menu.enable()
+    # ai_button.enable()
+    main_menu.car.gamemode = "race"
+    main_menu.car.count = 0.0
+    main_menu.car.reset_count = 0.0
+
+    sand_track.enable()
+    sand_track.played = True
+
+    for s in sand_track.track:
+        s.enable()
+        s.alpha = 255
+    if main_menu.car.graphics != "ultra fast":
+        for detail in sand_track.details:
+            detail.enable()
+            detail.alpha = 255
+
+    if main_menu.car.multiplayer_update == False and main_menu.car.ai:
+        for ai in ai_list:
+            # if ai.set_enabled:
+            #     ai.enable()
+            ai.position = (-63, -40, -7) + (random.randint(-2, 2), random.randint(-2, 2), random.randint(-2, 2))
+            ai.rotation = (0, 65, 0)
+            ai.set_random_car()
+            ai.set_random_texture()
+            ai.next_path = ai.sap1
+            ai.check_track()
+
+    main_menu.car.highscore_count = float(main_menu.car.sand_track_hs)
+
+
+
+
+
+play()
+
+
 def update():
     # If multiplayer, Call the Multiplayer class
     if car.multiplayer:
