@@ -14,10 +14,16 @@ class CommunicationClient:
         
     def receive(self):
         pass
-        # serialized = self.socket.recv()
+        try:
+            serialized = self.receive_socket.recv_string(flags=zmq.NOBLOCK)
+        except zmq.Again as e:
+            return None
         #serialized = json.dumps('w')
-        # obj = json.loads(serialized)
+        # print(serialized)
+        obj = json.loads(serialized)
         # print("Received reply")
+        # print(obj)
+        return obj
         # print(obj)
         
     def send(self, message = None):
@@ -26,6 +32,8 @@ class CommunicationClient:
         self.transmit_socket.send_string(serialized)
         
 def apply_input(held_keys, external_command):
+    if external_command is None:
+        return held_keys
     held_keys[external_command] = 1
     return held_keys
         

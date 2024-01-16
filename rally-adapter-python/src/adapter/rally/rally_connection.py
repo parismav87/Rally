@@ -53,11 +53,12 @@ class RallyConnection:
 
         logging.info('Starting the Rally Game')
         self.process = subprocess.Popen(f'python main.py {self.send_port_number} {self.receive_port_number}', shell=True, stdout=sys.stdout)
-        print("Started the game")
+        # print("Started the game")
         while True:
-            print("Received a message")
+            self.send_socket.send_string('"w"')
+            # print("Received a message")
             message = self.receive_socket.recv()
-            print(message)
+            # print(message)
             # self.handler.send_message_to_amp(message)
 
         # self.process = subprocess.Popen('python main.py', shell=True)
