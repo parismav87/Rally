@@ -10,6 +10,7 @@ from typing import List
 import zmq
 from zmq.eventloop.zmqstream import ZMQStream
 
+
 # RALLY_PATH = "C:\\Users\Arwin\\PycharmProjects\\Rally" # Used for testing, please change this in a later version!!
 
 
@@ -23,7 +24,6 @@ class RallyConnection:
     """
 
     def __init__(self, handler, send_port_number, receive_port_number):
-
         self.handler = handler
         self.send_port_number = send_port_number
         self.receive_port_number = receive_port_number
@@ -47,19 +47,26 @@ class RallyConnection:
         self.receive_socket = self.context.socket(zmq.SUB)
         self.receive_socket.connect(self.receive_ip_address)
         self.receive_socket.setsockopt_string(zmq.SUBSCRIBE, "")
-        self.stream = ZMQStream(self.receive_socket)
-        self.stream.on_recv(self.on_message)
+
+        # make a thread
+        self.wst = threading.Thread(target=self.run_forever)
+        self.wst.daemon = True
+        self.wst.start()
+
+        # self.stream = ZMQStream(self.receive_socket)
+        # self.stream.on_recv(self.on_message)
         # print("Connected to the game")
 
         logging.info('Starting the Rally Game')
-        self.process = subprocess.Popen(f'python main.py {self.send_port_number} {self.receive_port_number}', shell=True, stdout=sys.stdout)
+        self.process = subprocess.Popen(f'python main.py {self.send_port_number} {self.receive_port_number}',
+                                        shell=True, stdout=sys.stdout)
         # print("Started the game")
-        while True:
-            self.send_socket.send_string('"w"')
-            # print("Received a message")
-            message = self.receive_socket.recv()
-            # print(message)
-            # self.handler.send_message_to_amp(message)
+        # while True:
+        #     self.send_socket.send_string('"w"')
+        # print("Received a message")
+        # message = self.receive_socket.recv()
+        # print(message)
+        # self.handler.send_message_to_amp(message)
 
         # self.process = subprocess.Popen('python main.py', shell=True)
         # print("Starting!")
@@ -72,6 +79,10 @@ class RallyConnection:
         # print("Can't find main")
         # os.popen('python {}'.format(os.path.join(RALLY_PATH, "main.py")), shell=True)
 
+    def run_forever(self):
+        while True:
+            message = self.receive_socket.recv()
+            self.handler.send_message_to_amp(message)
 
     def send(self, message):
         """
@@ -82,7 +93,8 @@ class RallyConnection:
         """
         logging.debug('Sending message to SUT: {msg}'.format(msg=message))
 
-        self.send_socket.send(message)
+        self.send_socket.send_string(message)
+        self.handler.send_message_to_amp(message)
 
     # def on_open(self):
     #     """
@@ -97,17 +109,17 @@ class RallyConnection:
     #     """
     #     logging.debug('Closed connection to SUT')
     #
-    def on_message(self, msg: List[str]):
-        """
-        Callback that is called when the SUT sends a message
-
-        Args:
-            msg (str): Message of the SmartDoor SUT
-        """
-        logging.debug('Received message from sut: {msg}'.format(msg=msg))
-        # print("We received a message!!!!")
-        # self.handler.send_message_to_amp('\n'.join(msg))  # Send an enter separated list to AMP
-        print(msg)
+    # def on_message(self, msg: List[str]):
+    #     """
+    #     Callback that is called when the SUT sends a message
+    #
+    #     Args:
+    #         msg (str): Message of the SmartDoor SUT
+    #     """
+    #     logging.debug('Received message from sut: {msg}'.format(msg=msg))
+    # print("We received a message!!!!")
+    # self.handler.send_message_to_amp('\n'.join(msg))  # Send an enter separated list to AMP
+    # print(msg)
 
     #
     # def on_error(self, msg):
@@ -146,4 +158,3 @@ if __name__ == "__main__":
     connection.connect()
     sleep(60)
     # connection.stop()
-

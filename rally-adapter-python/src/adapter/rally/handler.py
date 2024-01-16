@@ -1,3 +1,4 @@
+import json
 import logging
 from datetime import datetime
 
@@ -130,15 +131,26 @@ class Handler(AbstractHandler):
             str: The message to be sent to the SUT.
         """
 
-        sut_msg = None
+        # sut_msg = None
         command_name = label.name.upper()
         #if label.name in ['lock', 'unlock']:
         #    sut_msg = '{msg}:{passcode}'.format(msg=command_name, passcode=label.parameters[0].value)
         #else:
         #    sut_msg = '{msg}'.format(msg=command_name)
-        sut_msg = '{msg}'.format(msg=command_name)
+        label_translations = {
+            'forward': '"w"',
+            'back': '"s"',
+            'left': '"a"',
+            'right': '"d"',
+            'forward_left': '"w"',
+            'forward_right': '"w"',
+            'backward_left': '"s"',
+            'backward_right': '"s"',
+        }
 
-        return sut_msg
+        # sut_msg = '{msg}'.format(msg=command_name)
+
+        return label_translations[command_name]
 
     def _message2label(self, message: str):
         """
@@ -150,10 +162,12 @@ class Handler(AbstractHandler):
             Label: The converted message as a Label.
         """
 
-        label_name = message.lower()
+        # label_name = message.lower()
+        # json_message = json.loads(message.lower())
+
         label = Label(
             sort=Sort.RESPONSE,
-            name=label_name,
+            name='game_state',
             channel='rally',
             physical_label=bytes(message, 'UTF-8'),
             timestamp=datetime.now())
