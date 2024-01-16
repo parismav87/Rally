@@ -162,11 +162,13 @@ sand_track.enable()
 # Initialize communication
 import sys
 from communication import CommunicationClient, extract_game_state, apply_input
-assert len(sys.argv) == 2
-socket_port = sys.argv[1]
+assert len(sys.argv) == 3
 print(sys.argv)
-print("Found ip_address {}".format(ip_address))
-socket_client = CommunicationClient(ip_address)
+receive_port_number = sys.argv[1]
+send_port_number = sys.argv[2]
+# print(sys.argv)
+# print("Found port number {}".format(port_number))
+socket_client = CommunicationClient(receive_port_number, send_port_number)
 
 def play():
 

@@ -117,7 +117,7 @@ class Handler(AbstractHandler):
             name='endpoint',
             tipe=Type.STRING,
             description='Base TCP Socket for the game to connect on',
-            value='tcp://*:5555'),
+            value='tcp://localhost:5555'),
         ])
 
     def _label2message(self, label: Label):

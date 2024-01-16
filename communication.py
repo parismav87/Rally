@@ -2,22 +2,27 @@ import zmq
 import json
 
 class CommunicationClient:
-    def __init__(self, ip_address):
+    def __init__(self, receive_port_number, transmit_port_number):
         self.context = zmq.Context()
-        self.socket = self.context.socket(zmq.PAIR)
-        self.socket.connect(ip_address)
+        self.receive_socket = self.context.socket(zmq.SUB)
+        self.receive_socket.connect('tcp://localhost:{}'.format(receive_port_number))
+
+        self.transmit_socket = self.context.socket(zmq.PUB)
+        self.transmit_socket.connect('tcp://localhost:{}'.format(int(transmit_port_number)+1))
+
         
     def receive(self):
-        serialized = self.socket.recv()
+        pass
+        # serialized = self.socket.recv()
         #serialized = json.dumps('w')
-        obj = json.loads(serialized)
-        print("Received reply")
-        print(obj)
+        # obj = json.loads(serialized)
+        # print("Received reply")
+        # print(obj)
         
     def send(self, message = None):
         serialized = json.dumps(message)
-        print(serialized)
-        self.socket.send_string(message)
+        # print(serialized)
+        self.transmit_socket.send_string(serialized)
         
 def apply_input(held_keys, external_command):
     held_keys[external_command] = 1

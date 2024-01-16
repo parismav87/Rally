@@ -1,6 +1,8 @@
 import logging
 import os
 import subprocess
+import sys
+import socket
 import threading
 from time import sleep
 from typing import List
@@ -20,9 +22,14 @@ class RallyConnection:
         endpoint (str): URL of the SmartDoor SUT
     """
 
-    def __init__(self, handler, ip_address):
+    def __init__(self, handler, send_port_number, receive_port_number):
+
         self.handler = handler
-        self.ip_address = ip_address
+        self.send_port_number = send_port_number
+        self.receive_port_number = receive_port_number
+        self.send_ip_address = 'tcp://*:{}'.format(send_port_number)
+        self.receive_ip_address = 'tcp://*:{}'.format(receive_port_number)
+        self.context = None
         self.process = None
         self.context = None
         self.socket = None
@@ -32,15 +39,21 @@ class RallyConnection:
             Connect to the SmartDoor SUT
         """
         logging.info('Opening a socket for the game')
+
         self.context = zmq.Context()
-        self.socket = self.context.socket(zmq.PAIR)
-        self.socket.bind(self.ip_address)
-        self.stream = ZMQStream(self.socket)
+        self.send_socket = self.context.socket(zmq.PUB)
+        self.send_socket.bind(self.send_ip_address)
+        self.receive_socket = self.context.socket(zmq.SUB)
+        self.receive_socket.bind(self.receive_ip_address)
+        self.stream = ZMQStream(self.receive_socket)
         self.stream.on_recv(self.on_message)
+        # print("Connected to the game")
 
         logging.info('Starting the Rally Game')
-        self.process = subprocess.Popen('python main.py {}'.format(self.ip_address), shell=True)
+        self.process = subprocess.Popen(f'python main.py {self.send_port_number} {self.receive_port_number}', shell=True, stdout=sys.stdout)
+        # self.process = subprocess.Popen('python main.py', shell=True)
         # print("Starting!")
+
         # Add a function that opens an instance of the rally game
         # if os.name == 'nt':
         #     self.game_pipe = os.popen(os.path.join(RALLY_PATH, "venv\\Scripts\\activate.bat"), mode='w', buffering=1)
@@ -59,7 +72,7 @@ class RallyConnection:
         """
         logging.debug('Sending message to SUT: {msg}'.format(msg=message))
 
-        self.socket.send(message)
+        self.send_socket.send(message)
 
     # def on_open(self):
     #     """
@@ -82,6 +95,7 @@ class RallyConnection:
             msg (str): Message of the SmartDoor SUT
         """
         logging.debug('Received message from sut: {msg}'.format(msg=msg))
+        print("We received a message!!!!")
         # self.handler.send_message_to_amp('\n'.join(msg))  # Send an enter separated list to AMP
         print(msg)
 
@@ -117,8 +131,9 @@ class RallyConnection:
         self.context = None
 
 
-# if __name__ == "__main__":
-#     connection = RallyConnection(None, "tcp://*:5555")
-#     connection.connect()
-#     connection.stop()
+if __name__ == "__main__":
+    connection = RallyConnection(None, 8080, 8081)
+    connection.connect()
+    sleep(60)
+    # connection.stop()
 
