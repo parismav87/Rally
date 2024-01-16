@@ -39,7 +39,7 @@ class RallyConnection:
         self.stream.on_recv(self.on_message)
 
         logging.info('Starting the Rally Game')
-        self.process = subprocess.Popen('python main.py', shell=True)
+        self.process = subprocess.Popen('python main.py {}'.format(self.ip_address), shell=True)
         # print("Starting!")
         # Add a function that opens an instance of the rally game
         # if os.name == 'nt':
@@ -82,7 +82,8 @@ class RallyConnection:
             msg (str): Message of the SmartDoor SUT
         """
         logging.debug('Received message from sut: {msg}'.format(msg=msg))
-        self.handler.send_message_to_amp('\n'.join(msg))  # Send an enter separated list to AMP
+        # self.handler.send_message_to_amp('\n'.join(msg))  # Send an enter separated list to AMP
+        print(msg)
 
     #
     # def on_error(self, msg):
@@ -111,11 +112,11 @@ class RallyConnection:
         self.socket.close()
         self.context.term()
 
-        self.game_pipe = None
+        self.process = None
         self.socket = None
         self.context = None
-#
-#
+
+
 # if __name__ == "__main__":
 #     connection = RallyConnection(None, "tcp://*:5555")
 #     connection.connect()
