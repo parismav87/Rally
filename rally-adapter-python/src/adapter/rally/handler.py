@@ -116,8 +116,8 @@ class Handler(AbstractHandler):
         return Configuration([ConfigurationItem(\
             name='endpoint',
             tipe=Type.STRING,
-            description='Base websocket URL of the Rally API',
-            value='ws://localhost:3001'),
+            description='Base TCP Socket for the game to connect on',
+            value='tcp://*:5555'),
         ])
 
     def _label2message(self, label: Label):
