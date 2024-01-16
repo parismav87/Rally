@@ -1,43 +1,54 @@
 import logging
+import os
+import subprocess
 import threading
+from time import sleep
+from typing import List
 
-import websocket
+import zmq
+from zmq.eventloop.zmqstream import ZMQStream
+
+# RALLY_PATH = "C:\\Users\Arwin\\PycharmProjects\\Rally" # Used for testing, please change this in a later version!!
 
 
 class RallyConnection:
     """
-    This class handles the connection, sending and receiving of messages to the Rally SUT
+    This class handles the the rally game
 
     Attributes:
-        handler (adapter.rally.Handler)
-        endpoint (str): URL of the Rally SUT
+        handler (adapter.smartdoor.Handler)
+        endpoint (str): URL of the SmartDoor SUT
     """
 
-    def __init__(self, handler, endpoint):
+    def __init__(self, handler, ip_address):
         self.handler = handler
-        self.endpoint = endpoint
-
-        self.websocket = None
-        self.wst = None
+        self.ip_address = ip_address
+        self.process = None
+        self.context = None
+        self.socket = None
 
     def connect(self):
         """
-            Connect to the Rally SUT
+            Connect to the SmartDoor SUT
         """
-        logging.info('Connecting to Rally')
+        logging.info('Opening a socket for the game')
+        self.context = zmq.Context()
+        self.socket = self.context.socket(zmq.PAIR)
+        self.socket.bind(self.ip_address)
+        self.stream = ZMQStream(self.socket)
+        self.stream.on_recv(self.on_message)
 
-        # Use lambda functions to correctly pass the self variable.
-        self.websocket = websocket.WebSocketApp(
-            self.endpoint,
-            on_open=lambda _: self.on_open(),
-            on_close=lambda _, close_status_code, close_msg: self.on_close(),
-            on_message=lambda _, msg: self.on_message(msg),
-            on_error=lambda _, msg: self.on_error(msg)
-        )
+        logging.info('Starting the Rally Game')
+        self.process = subprocess.Popen('python main.py', shell=True)
+        # print("Starting!")
+        # Add a function that opens an instance of the rally game
+        # if os.name == 'nt':
+        #     self.game_pipe = os.popen(os.path.join(RALLY_PATH, "venv\\Scripts\\activate.bat"), mode='w', buffering=1)
+        # else:
+        #     self.game_pipe = os.popen('source ./venv/bin/activate', mode='w')
+        # print("Can't find main")
+        # os.popen('python {}'.format(os.path.join(RALLY_PATH, "main.py")), shell=True)
 
-        self.wst = threading.Thread(target=self.websocket.run_forever)
-        self.wst.daemon = True
-        self.wst.start()
 
     def send(self, message):
         """
@@ -48,48 +59,65 @@ class RallyConnection:
         """
         logging.debug('Sending message to SUT: {msg}'.format(msg=message))
 
-        self.websocket.send(message)
+        self.socket.send(message)
 
-    def on_open(self):
-        """
-        Callback that is called when the socket to the SUT is opened.
-        """
-        logging.info('Connected to SUT')
-        self.send('RESET')
-
-    def on_close(self):
-        """
-        Callback that is called when the socket is closed
-        """
-        logging.debug('Closed connection to SUT')
-
-    def on_message(self, msg):
+    # def on_open(self):
+    #     """
+    #     Callback that is called when the socket to the SUT is opened.
+    #     """
+    #     logging.info('Connected to SUT')
+    #     self.send('RESET')
+    #
+    # def on_close(self):
+    #     """
+    #     Callback that is called when the socket is closed
+    #     """
+    #     logging.debug('Closed connection to SUT')
+    #
+    def on_message(self, msg: List[str]):
         """
         Callback that is called when the SUT sends a message
 
         Args:
-            msg (str): Message of the Rally SUT
+            msg (str): Message of the SmartDoor SUT
         """
         logging.debug('Received message from sut: {msg}'.format(msg=msg))
-        self.handler.send_message_to_amp(msg)
+        self.handler.send_message_to_amp('\n'.join(msg))  # Send an enter separated list to AMP
 
-    def on_error(self, msg):
-        """
-        Callback that is called when something is wrong with the websocket connection
-
-        Args:
-            msg (str): Error message
-        """
-        logging.error("Error with connection to sut: {e}".format(e=msg))
+    #
+    # def on_error(self, msg):
+    #     """
+    #     Callback that is called when something is wrong with the websocket connection
+    #
+    #     Args:
+    #         msg (str): Error message
+    #     """
+    #     logging.error("Error with connection to sut: {e}".format(e=msg))
 
     def stop(self):
         """
         Perform any cleanup if the SUT is closed
         """
-        if self.websocket:
-            self.websocket.close()
-            logging.debug('Stopping thread which handles WebSocket connection with SUT')
-            self.websocket.keep_running = False
-            self.wst.join()
-            logging.debug('Thread stopped')
-            self.wst = None
+        # if self.websocket:
+        #     self.websocket.close()
+        #     logging.debug('Stopping thread which handles WebSocket connection with SUT')
+        #     self.websocket.keep_running = False
+        #     self.wst.join()
+        #     logging.debug('Thread stopped')
+        #     self.wst = None
+        self.process.kill()
+        self.process.terminate()
+        self.stream.close()
+        self.socket.close()
+        self.context.term()
+
+        self.game_pipe = None
+        self.socket = None
+        self.context = None
+#
+#
+# if __name__ == "__main__":
+#     connection = RallyConnection(None, "tcp://*:5555")
+#     connection.connect()
+#     connection.stop()
+
