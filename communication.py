@@ -36,6 +36,13 @@ def extract_game_state(car):
         'x' : car.x,
         'y' : car.y,
         'z' : car.z,
+        'collision' : car.collided
+    }
+    '''
+    game_state = {
+        'x' : car.x,
+        'y' : car.y,
+        'z' : car.z,
         'speed' : car.speed,
         'velocity_y' : car.velocity_y,
         'rotation_speed' : car.rotation_speed,
@@ -53,4 +60,5 @@ def extract_game_state(car):
         'min_drift_speed' : car.min_drift_speed,
         'pivot_rotation_distance' : car.pivot_rotation_distance,
     }
+    '''
     return game_state

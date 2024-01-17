@@ -39,6 +39,9 @@ class Car(Entity):
         self.max_drift_speed = 40
         self.min_drift_speed = 20
         self.pivot_rotation_distance = 1
+        
+        # Collision flag
+        self.collided = 0
 
         # Camera Follow
         self.camera_angle = "behind"
@@ -753,6 +756,9 @@ class Car(Entity):
 
             if x_ray.distance > self.scale_x / 2 + abs(movementX):
                 self.x += movementX
+                self.collided = 0
+            else:
+                self.collided = 1
 
         if movementZ != 0:
             direction = (0, 0, sign(movementZ))
@@ -760,6 +766,9 @@ class Car(Entity):
 
             if z_ray.distance > self.scale_z / 2 + abs(movementZ):
                 self.z += movementZ
+                self.collided = 0
+            else:
+                self.collided = 1
 
     def reset_car(self):
         """
