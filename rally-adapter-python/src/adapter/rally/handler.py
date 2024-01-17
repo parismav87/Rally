@@ -1,6 +1,9 @@
 import json
 import logging
 from datetime import datetime
+import os
+import subprocess
+import sys
 
 from generic.api.configuration import ConfigurationItem, Configuration
 from generic.api.label import Label, Sort
@@ -25,6 +28,7 @@ class Handler(AbstractHandler):
     def __init__(self):
         super().__init__()
         self.sut = None
+        self.process = None
 
     def send_message_to_amp(self, raw_message: str):
         """
@@ -50,7 +54,9 @@ class Handler(AbstractHandler):
             configuration (Configuration): The configuration to be used for this test run. First item contains the
                 url of the Rally SUT.
         """
-        self.sut = RallyConnection(self, 5555, 5556)
+        logging.info('Starting Game')
+        self.process = subprocess.Popen('python main.py', shell=True)
+        self.sut = RallyConnection(self, 7777)
         self.sut.connect()
 
     def reset(self):
@@ -67,6 +73,10 @@ class Handler(AbstractHandler):
         logging.info('Stopping the plugin adapter from plugin handler')
 
         self.sut.stop()
+        logging.info('Starting Game')
+        self.process.kill()
+        self.process.terminate()
+        
         self.sut = None
 
         logging.debug('Finished stopping the plugin adapter from plugin handler')
