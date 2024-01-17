@@ -58,7 +58,7 @@ class Handler(AbstractHandler):
         self.process = subprocess.Popen('python main.py', shell=True)
         self.sut = RallyConnection(self, 7777)
         self.sut.connect()
-        self.handler.adapter_core.send_ready()
+        self.adapter_core.send_ready()
 
     def reset(self):
         """
