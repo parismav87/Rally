@@ -174,6 +174,7 @@ class Handler(AbstractHandler):
         """
 
         # label_name = message.lower()
+        print(message)
         json_message = json.loads(message.lower())
         parameters = {
             'coordinates': {

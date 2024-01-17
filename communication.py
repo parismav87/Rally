@@ -23,7 +23,7 @@ class CommunicationClient:
     def send(self, message = None):
         serialized = json.dumps(message)
         # print(serialized)
-        self.socket.send_string(serialized + self.identity)
+        self.socket.send_string(serialized)
         
 def apply_input(held_keys, external_command):
     if external_command is None:
