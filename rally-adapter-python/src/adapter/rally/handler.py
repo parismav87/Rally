@@ -174,7 +174,11 @@ class Handler(AbstractHandler):
         """
 
         # label_name = message.lower()
-        json_message = json.loads(message.lower())
+        split_message = message.split()
+        channel = split_message[0]
+        payload = split_message[1]
+
+        json_message = json.loads(payload)
         parameters = {
             'coordinates': {
                 'x': json_message['x'],
@@ -189,7 +193,7 @@ class Handler(AbstractHandler):
         label = Label(
             sort=Sort.RESPONSE,
             name='game_state',
-            channel='rally',
+            channel=channel,
             parameters=[Parameter('game_state', Type.HASH, parameters)],
             physical_label=bytes(message, 'UTF-8'),
             timestamp=datetime.now())
