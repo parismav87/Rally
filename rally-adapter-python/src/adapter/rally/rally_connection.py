@@ -77,7 +77,7 @@ class RallyConnection:
             #self.socket.send_string("w")
             # sleep(2)
             # print (message)
-            self.handler.send_message_to_amp(message.encode())
+            self.handler.send_message_to_amp(message.decode())
             #self.handler.send_message_to_amp(message)
 
     def send(self, message):
