@@ -185,11 +185,10 @@ class Handler(AbstractHandler):
             'coordinates' : {
                 'x': json_message['x'],
                 'y': json_message['y'],
-                'z': json_message['z'],
-                'c': float(json_message['collision']),
-            }
+                'z': json_message['z']
+            },
+            'collision': json_message['collision']
         }
-        print(state)
 
 
 
