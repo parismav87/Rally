@@ -55,7 +55,7 @@ class Handler(AbstractHandler):
                 url of the Rally SUT.
         """
         logging.info('Starting Game')
-        # self.process = subprocess.Popen('python main.py', shell=True)
+        #self.process = subprocess.Popen('python main.py', shell=True)
         self.sut = RallyConnection(self, 7777)
         self.sut.connect()
         self.adapter_core.send_ready()
@@ -93,10 +93,8 @@ class Handler(AbstractHandler):
             str: The raw message send to the SUT (in a format that is understood by the SUT).
         """
         logging.debug('Stimulate is called, passing the message to the SUT')
-        print('Send label')
         sd_msg = self._label2message(label)
         self.sut.send(sd_msg)
-        print(sd_msg)
         return bytes(sd_msg, 'UTF-8')
 
     def supported_labels(self):

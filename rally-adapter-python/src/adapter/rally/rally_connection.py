@@ -30,6 +30,7 @@ class RallyConnection:
         self.context = zmq.Context()
         self.socket = self.context.socket(zmq.ROUTER)
         self.socket.bind(f'tcp://*:{port_number}')
+        self.clients = []
 
     def connect(self):
         """
@@ -72,11 +73,16 @@ class RallyConnection:
         while True:
             #identity, message = self.socket.recv()
             identity, message = self.socket.recv_multipart()
-            # echo_msg = "w"
-            # self.socket.send_multipart([identity, echo_msg.encode()])
+            if message:
+                print ("recv response from game:", message)
+            if identity not in self.clients:
+                self.clients.append(identity)
+            #echo_msg = "w"
+            #self.socket.send_multipart([identity, echo_msg.encode()])
             #self.socket.send_string("w")
             # sleep(2)
             # print (message)
+           # for client in self.clients:
             self.handler.send_message_to_amp(message.decode())
             #self.handler.send_message_to_amp(message)
 
@@ -89,7 +95,10 @@ class RallyConnection:
         """
         logging.debug('Sending message to SUT: {msg}'.format(msg=message))
 
-        self.socket.send_string(message)
+        if self.clients:
+            self.socket.send_multipart([self.clients[-1], message.encode()])
+
+        #self.socket.send_string(message)
         #self.handler.send_message_to_amp(message)
 
     # def on_open(self):
@@ -139,7 +148,6 @@ class RallyConnection:
         #     logging.debug('Thread stopped')
         #     self.wst = None
 
-        self.stream.close()
         self.socket.close()
         self.context.term()
 
@@ -151,5 +159,5 @@ class RallyConnection:
 if __name__ == "__main__":
     connection = RallyConnection(None, 7777)
     connection.connect()
-    sleep(60)
+    sleep(50)
     # connection.stop()
