@@ -55,7 +55,7 @@ class Handler(AbstractHandler):
                 url of the Rally SUT.
         """
         logging.info('Starting Game')
-        # self.process = subprocess.Popen('python main.py', shell=True)
+        #self.process = subprocess.Popen('python main.py', shell=True)
         self.sut = RallyConnection(self, 7777)
         self.sut.connect()
         self.adapter_core.send_ready()
@@ -93,10 +93,8 @@ class Handler(AbstractHandler):
             str: The raw message send to the SUT (in a format that is understood by the SUT).
         """
         logging.debug('Stimulate is called, passing the message to the SUT')
-        print('Send label')
         sd_msg = self._label2message(label)
         self.sut.send(sd_msg)
-        print(sd_msg)
         return bytes(sd_msg, 'UTF-8')
 
     def supported_labels(self):
@@ -176,21 +174,22 @@ class Handler(AbstractHandler):
         """
 
         # label_name = message.lower()
-        print(message)
+        # print(message)
         split_message = message.partition(' ')
         channel = split_message[0]
         payload = split_message[2]
 
-        print(payload)
+        # print(payload)
         json_message = json.loads(payload)
-        parameters = {
+        state = {
             'coordinates' : {
                 'x': json_message['x'],
                 'y': json_message['y'],
-                'z': json_message['z']
+                'z': json_message['z'],
+                'c': float(json_message['collision']),
             }
         }
-        print(parameters)
+        print(state)
 
 
 
@@ -198,7 +197,7 @@ class Handler(AbstractHandler):
             sort=Sort.RESPONSE,
             name='game_state',
             channel=channel,
-            parameters=[Parameter('state', Type.HASH, parameters)],
+            parameters=[Parameter('state', Type.HASH, state)],
             physical_label=bytes(message, 'UTF-8'),
             timestamp=datetime.now())
 
