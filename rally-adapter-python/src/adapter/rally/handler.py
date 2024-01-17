@@ -174,21 +174,22 @@ class Handler(AbstractHandler):
         """
 
         # label_name = message.lower()
-        print(message)
+        # print(message)
         split_message = message.partition(' ')
         channel = split_message[0]
         payload = split_message[2]
 
-        print(payload)
+        # print(payload)
         json_message = json.loads(payload)
-        parameters = {
+        state = {
             'coordinates' : {
                 'x': json_message['x'],
                 'y': json_message['y'],
-                'z': json_message['z']
+                'z': json_message['z'],
+                'c': float(json_message['collision']),
             }
         }
-        print(parameters)
+        print(state)
 
 
 
@@ -196,7 +197,7 @@ class Handler(AbstractHandler):
             sort=Sort.RESPONSE,
             name='game_state',
             channel=channel,
-            parameters=[Parameter('state', Type.HASH, parameters)],
+            parameters=[Parameter('state', Type.HASH, state)],
             physical_label=bytes(message, 'UTF-8'),
             timestamp=datetime.now())
 
