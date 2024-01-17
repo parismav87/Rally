@@ -142,7 +142,7 @@ class Handler(AbstractHandler):
         """
 
         # sut_msg = None
-        command_name = label.name.upper()
+        command_name = label.name.lower()
         #if label.name in ['lock', 'unlock']:
         #    sut_msg = '{msg}:{passcode}'.format(msg=command_name, passcode=label.parameters[0].value)
         #else:
