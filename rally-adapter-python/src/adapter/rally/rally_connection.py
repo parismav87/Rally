@@ -72,11 +72,12 @@ class RallyConnection:
         while True:
             #identity, message = self.socket.recv()
             identity, message = self.socket.recv_multipart()
-            echo_msg = "w"
-            self.socket.send_multipart([identity, echo_msg.encode()])
+            # echo_msg = "w"
+            # self.socket.send_multipart([identity, echo_msg.encode()])
             #self.socket.send_string("w")
-            sleep(2)
-            print (message)
+            # sleep(2)
+            # print (message)
+            self.handler.send_message_to_amp(message.encode())
             #self.handler.send_message_to_amp(message)
 
     def send(self, message):
