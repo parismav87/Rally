@@ -55,7 +55,7 @@ class Handler(AbstractHandler):
                 url of the Rally SUT.
         """
         logging.info('Starting Game')
-        #self.process = subprocess.Popen('python main.py', shell=True)
+        # self.process = subprocess.Popen('python main.py', shell=True)
         self.sut = RallyConnection(self, 7777)
         self.sut.connect()
         self.adapter_core.send_ready()
@@ -77,7 +77,7 @@ class Handler(AbstractHandler):
         logging.info('Starting Game')
         self.process.kill()
         self.process.terminate()
-        
+
         self.sut = None
 
         logging.debug('Finished stopping the plugin adapter from plugin handler')
@@ -105,7 +105,7 @@ class Handler(AbstractHandler):
              [Label]: List of all supported labels of this adapter
         """
         return [
-            
+
             _stimulus('right'),
             _stimulus('left'),
             _stimulus('forward'),
@@ -115,7 +115,7 @@ class Handler(AbstractHandler):
             _stimulus('backward_right'),
             _stimulus('backward_left'),
             _response('game_state', parameters=[Parameter('state', Type.STRUCT)]),
-            #_stimulus('lock', parameters=[Parameter('passcode', Type.INTEGER)]),
+            # _stimulus('lock', parameters=[Parameter('passcode', Type.INTEGER)]),
         ]
 
     def configuration(self):
@@ -125,7 +125,7 @@ class Handler(AbstractHandler):
         Returns:
             Configuration
         """
-        return Configuration([ConfigurationItem(\
+        return Configuration([ConfigurationItem( \
             name='endpoint',
             tipe=Type.STRING,
             description='Base TCP Socket for the game to connect on',
@@ -144,9 +144,9 @@ class Handler(AbstractHandler):
 
         # sut_msg = None
         command_name = label.name.lower()
-        #if label.name in ['lock', 'unlock']:
+        # if label.name in ['lock', 'unlock']:
         #    sut_msg = '{msg}:{passcode}'.format(msg=command_name, passcode=label.parameters[0].value)
-        #else:
+        # else:
         #    sut_msg = '{msg}'.format(msg=command_name)
         label_translations = {
             'forward': '"w"',
@@ -182,15 +182,13 @@ class Handler(AbstractHandler):
         # print(payload)
         json_message = json.loads(payload)
         state = {
-            'coordinates' : {
+            'coordinates': {
                 'x': json_message['x'],
                 'y': json_message['y'],
-                'z': json_message['z']
+                'z': json_message['z'],
+                'collision': float(json_message['collision'])
             },
-            'collision': json_message['collision']
         }
-
-
 
         label = Label(
             sort=Sort.RESPONSE,
