@@ -55,7 +55,7 @@ class Handler(AbstractHandler):
                 url of the Rally SUT.
         """
         logging.info('Starting Game')
-        self.process = subprocess.Popen('python main.py', shell=True)
+        # self.process = subprocess.Popen('python main.py', shell=True)
         self.sut = RallyConnection(self, 7777)
         self.sut.connect()
         self.adapter_core.send_ready()
@@ -174,12 +174,23 @@ class Handler(AbstractHandler):
         """
 
         # label_name = message.lower()
-        # json_message = json.loads(message.lower())
+        json_message = json.loads(message.lower())
+        parameters = {
+            'coordinates': {
+                'x': json_message['x'],
+                'y': json_message['y'],
+                'z': json_message['z']
+            },
+            'collision': False # Placeholder so far!
+        }
+
+
 
         label = Label(
             sort=Sort.RESPONSE,
             name='game_state',
             channel='rally',
+            parameters=[Parameter('game_state', Type.HASH, parameters)],
             physical_label=bytes(message, 'UTF-8'),
             timestamp=datetime.now())
 
