@@ -137,8 +137,7 @@ class RallyConnection:
         #     self.wst.join()
         #     logging.debug('Thread stopped')
         #     self.wst = None
-        self.process.kill()
-        self.process.terminate()
+
         self.stream.close()
         self.socket.close()
         self.context.term()
