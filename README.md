@@ -5,17 +5,18 @@ A Simple 3D Racing Game Made In Python With The Ursina Engine
 Feel free to leave comments or feedback on how I can improve the game :)
 
 # Easy Test command
-'''
-### start the game
-python3 main.py 
 
-### start the test
-python3 rally-adapter-python/src/adapter/rally/rally_connection.py
-
-### start the adapter
-  python3 rally-adapter-python/src/adapter/plugin_adapter.py -u wss://research01.axini.com:443/adapters -t eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE3Mzc1NDMwNzcsInN1YiI6InguZ3VvM0B1dmEubmwiLCJpc3MiOiJ2bXB1YmxpY3Byb2QwMSIsInNjb3BlIjoiYWRhcHRlciJ9.Bd_KIzV7KQb1IdvgeVEQhwPk_iZRdpcmdRNlA5O2M0I -ll INFO
-
-'''
+  '''
+  ### start the game
+  python3 main.py 
+  
+  ### start the test
+  python3 rally-adapter-python/src/adapter/rally/rally_connection.py
+  
+  ### start the adapter
+    python3 rally-adapter-python/src/adapter/plugin_adapter.py -u wss://research01.axini.com:443/adapters -t eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE3Mzc1NDMwNzcsInN1YiI6InguZ3VvM0B1dmEubmwiLCJpc3MiOiJ2bXB1YmxpY3Byb2QwMSIsInNjb3BlIjoiYWRhcHRlciJ9.Bd_KIzV7KQb1IdvgeVEQhwPk_iZRdpcmdRNlA5O2M0I -ll INFO
+  
+  '''
 
 # Installation
 
