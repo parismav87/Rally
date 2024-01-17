@@ -285,8 +285,7 @@ def update():
         achievements.time_spent += time.dt
         
     game_state = extract_game_state(car)
-    if external_command:
-        socket_client.send(game_state)
+    socket_client.send(game_state)
         
 def input(key):
     # If multiplayer, send the client's position, rotation, texture, username and highscore to the server
