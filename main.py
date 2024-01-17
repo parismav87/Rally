@@ -247,7 +247,8 @@ play()
 def update():
     
     external_command = socket_client.receive()
-    apply_input(held_keys, external_command)
+    if external_command:
+        apply_input(held_keys, external_command)
     
     # If multiplayer, Call the Multiplayer class
     if car.multiplayer:
@@ -284,7 +285,8 @@ def update():
         achievements.time_spent += time.dt
         
     game_state = extract_game_state(car)
-    socket_client.send(game_state)
+    if external_command:
+        socket_client.send(game_state)
         
 def input(key):
     # If multiplayer, send the client's position, rotation, texture, username and highscore to the server
