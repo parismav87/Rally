@@ -4,6 +4,7 @@ from datetime import datetime
 import os
 import subprocess
 import sys
+from time import sleep
 
 from generic.api.configuration import ConfigurationItem, Configuration
 from generic.api.label import Label, Sort
@@ -94,11 +95,13 @@ class Handler(AbstractHandler):
         """
         logging.debug('Stimulate is called, passing the message to the SUT')
         sd_msg = self._label2message(label)
+        sleep(0.5)
         self.sut.send(sd_msg)
         sleep(0.5)
         print ("receive stimulate from amp sd_msg: ", sd_msg)
         identity, message = self.sut.recv()
-        self.send_message_to_amp(message)
+        if message:
+            self.send_message_to_amp(message)
 
         return bytes(sd_msg, 'UTF-8')
 
