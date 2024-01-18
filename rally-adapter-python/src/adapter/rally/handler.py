@@ -95,6 +95,7 @@ class Handler(AbstractHandler):
         logging.debug('Stimulate is called, passing the message to the SUT')
         sd_msg = self._label2message(label)
         self.sut.send(sd_msg)
+        print ("receive stimulate from amp sd_msg: ", sd_msg)
         return bytes(sd_msg, 'UTF-8')
 
     def supported_labels(self):
@@ -175,27 +176,30 @@ class Handler(AbstractHandler):
 
         # label_name = message.lower()
         # print(message)
-        split_message = message.partition(' ')
-        channel = split_message[0]
-        payload = split_message[2]
+        if message:
+            split_message = message.partition(' ')
+            channel = split_message[0]
+            payload = split_message[2]
 
-        # print(payload)
-        json_message = json.loads(payload)
-        state = {
-            'coordinates': {
-                'x': json_message['x'],
-                'y': json_message['y'],
-                'z': json_message['z'],
-                'collision': float(json_message['collision'])
-            },
-        }
+            # print(payload)
+            json_message = json.loads(payload)
+            state = {
+                'coordinates': {
+                    'x': json_message['x'],
+                    'y': json_message['y'],
+                    'z': json_message['z'],
+                    'collision': float(json_message['collision'])
+                },
+            }
 
-        label = Label(
-            sort=Sort.RESPONSE,
-            name='game_state',
-            channel=channel,
-            parameters=[Parameter('state', Type.HASH, state)],
-            physical_label=bytes(message, 'UTF-8'),
-            timestamp=datetime.now())
+            label = Label(
+                sort=Sort.RESPONSE,
+                name='game_state',
+                channel=channel,
+                parameters=[Parameter('state', Type.HASH, state)],
+                physical_label=bytes(message, 'UTF-8'),
+                timestamp=datetime.now())
+        else:
+            label = None
 
         return label

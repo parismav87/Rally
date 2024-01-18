@@ -83,7 +83,7 @@ class CommunicationClient:
         
     def receive(self):
         try:
-            string = self.socket.recv_string(flags=zmq.NOBLOCK)
+            string = self.socket.recv(flags = zmq.NOBLOCK)
             print ("recv command: ", string)
             
             if string not in self.name_to_task.keys():
