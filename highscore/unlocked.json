@@ -74,7 +74,7 @@
         }
     },
     "cosmetics": {
-        "viking_helmet": false,
+        "viking_helmet": true,
         "duck": false,
         "banana": false,
         "surfinbird": false
