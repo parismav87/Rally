@@ -114,9 +114,10 @@ class RallyConnection:
         logging.debug('Sending message to SUT: {msg}'.format(msg=message))
 
         #print ("send to game:", message)
-        print ("send to game:",self.clients[-1], message)
-        
-        self.socket.send_multipart([self.clients[-1], message.encode()])
+        if self.clients:
+            print ("send to game:",self.clients[-1], message)
+            
+            self.socket.send_multipart([self.clients[-1], message.encode()])
 
         #self.socket.send_string(message)
         #self.handler.send_message_to_amp(message)

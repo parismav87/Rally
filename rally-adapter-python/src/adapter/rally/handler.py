@@ -100,8 +100,7 @@ class Handler(AbstractHandler):
         sleep(0.5)
         print ("receive stimulate from amp sd_msg: ", sd_msg)
         identity, message = self.sut.recv()
-        if message:
-            self.send_message_to_amp(message)
+        self.send_message_to_amp(message)
 
         return bytes(sd_msg, 'UTF-8')
 

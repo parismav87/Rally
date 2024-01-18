@@ -2,8 +2,7 @@ from ursina import *
 from direct.stdpy import thread
 
 from car import Car
-from ai import AICar, PathObject
-from goto_controller import go_to_waypoint
+from ai import AICar
 
 from multiplayer import Multiplayer
 from main_menu import MainMenu
@@ -163,8 +162,16 @@ sand_track.enable()
 # Initialize communication
 import sys
 from communication import CommunicationClient, extract_game_state, apply_input
+#assert len(sys.argv) == 3
+#print(sys.argv)
+#receive_port_number = sys.argv[1]
+#send_port_number = sys.argv[2]
+# print(sys.argv)
+# print("Found port number {}".format(port_number))
+#socket_client = CommunicationClient(receive_port_number, send_port_number)
 socket_client = CommunicationClient("rally")
 socket_client.send_message(b"gamestart")
+
 def play():
 
     car.multiplayer = False
@@ -232,48 +239,19 @@ def play():
 
     main_menu.car.highscore_count = float(main_menu.car.sand_track_hs)
 
-sap1 = PathObject((-41, -50, -7), 90)
-sap2 = PathObject((-20, -50, -30), 180)
-sap3 = PathObject((-48, -47, -55), 270)
 
-sap4 = PathObject((-100, -50, -61), 270)
-sap5 = PathObject((-128, -50, -80), 150)
-sap6 = PathObject((-100, -50, -115), 70)
-sap7 = PathObject((-80, -46, -86), -30)
-sap8 = PathObject((-75, -50, -34), 0)
-saps = [sap1, sap2, sap3, sap4, sap5, sap6, sap7, sap8]
 
-current_sap = 0
 
 
 play()    
 
 def update():
-    global current_sap
-    # Commented for testing
-    # external_command = socket_client.receive()
-    # if external_command:
-    #     print('Got the task')
-    #     print(socket_client.task_from_name(external_command))
-
-    # socket_client.task_from_name('goto', )
-        
-    # if socket_client.current_task_name:
-    #     key = socket_client.get_key()
-    #     print('Executing task {}, frame {}, key {}'.format(socket_client.current_task_name, socket_client.execution_frame, key))
-    #     print('Flag', socket_client.send_flag)
-    #     if key != -1:
-    #         apply_input(held_keys, key)
-
-    # print(held_keys)
-    held_keys['w'] = 0
-    held_keys['a'] = 0
-    held_keys['s'] = 0
-    held_keys['d'] = 0
-    _, arrived = go_to_waypoint(car, saps[current_sap], held_keys, nr_rays=41, check_collision=True)
-    if arrived:
-        current_sap = (current_sap + 1) % len(saps)
-
+    
+    external_command = socket_client.receive()
+    if external_command:
+        print('Got the key')
+        print(external_command)
+        apply_input(held_keys, external_command)
     
     # If multiplayer, Call the Multiplayer class
     if car.multiplayer:
@@ -308,10 +286,9 @@ def update():
     
     if achievements.time_spent < 10:
         achievements.time_spent += time.dt
-    #
-    # if socket_client.send_flag != -1:
-    #     print('send_flag == {}, sending'.format(socket_client.send_flag))
-    #     socket_client.send_message(car)
+        
+    game_state = extract_game_state(car)
+    socket_client.send_message(game_state)
         
 def input(key):
     # If multiplayer, send the client's position, rotation, texture, username and highscore to the server

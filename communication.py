@@ -63,7 +63,7 @@ def extract_game_state(car):
 
 # Really a Task Manager now
 class CommunicationClient:
-    def __init__(self, identity = "rally"):
+    def __init__(self, identity = b"rally"):
         self.context = zmq.Context()
         self.socket = self.context.socket(zmq.DEALER)
         self.socket.setsockopt(zmq.IDENTITY, identity.encode())
@@ -75,15 +75,16 @@ class CommunicationClient:
         self.execution_frame = 0
         self.send_flag = -1
         self.name_to_task = {
-            'w' : task_forward,
-            's' : task_back,
-            'a' : task_left,
-            'd' : task_right,
+            '"w"' : task_forward,
+            '"s"' : task_back,
+            '"a"' : task_left,
+            '"d"' : task_right,
             'RESET' : task_reset
         }
         
     def receive(self):
         try:
+            #string = self.socket.recv()
             string = self.socket.recv(flags = zmq.NOBLOCK)
             print ("recv command: ", string)
             
