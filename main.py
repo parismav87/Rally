@@ -246,6 +246,11 @@ play()
 
 def update():
     
+    held_keys['w'] = 0
+    held_keys['a'] = 0
+    held_keys['s'] = 0
+    held_keys['d'] = 0
+    
     #print(held_keys)
     external_command = socket_client.receive()
     if external_command:
