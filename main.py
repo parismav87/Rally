@@ -247,7 +247,7 @@ def update():
     if socket_client.current_task_name:
         key = socket_client.get_key()
         print('Executing task {}, frame {}, key {}'.format(socket_client.current_task_name, socket_client.execution_frame, key))
-        print('Flag', socket_client.send_state_flag)
+        print('Flag', socket_client.send_flag)
         if key != -1:
             apply_input(held_keys, key)
     
@@ -285,10 +285,9 @@ def update():
     if achievements.time_spent < 10:
         achievements.time_spent += time.dt
     
-    if socket_client.send_state_flag:
-        print('send_state_flag == True, sending')
-        game_state = extract_game_state(car)
-        socket_client.send(game_state)
+    if socket_client.send_flag != -1:
+        print('send_flag == {}, sending'.format(socket_client.send_flag))
+        socket_client.send_message(car)
         
 def input(key):
     # If multiplayer, send the client's position, rotation, texture, username and highscore to the server
