@@ -39,7 +39,7 @@ class RallyConnection:
         logging.info('Opening a socket for the game')
 
         # make a thread
-        self.wst = threading.Thread(target=self.run_forever_test)
+        self.wst = threading.Thread(target=self.run_forever)
         self.wst.daemon = True
         self.wst.start()
 
@@ -82,8 +82,6 @@ class RallyConnection:
             if identity not in self.clients:
                 self.clients.append(identity)
             identity = b'rally'
-            echo_msg = "w"
-            print(echo_msg)
             self.socket.send_multipart([identity, echo_msg.encode()])        
 
     def run_forever(self):
@@ -97,7 +95,7 @@ class RallyConnection:
                 print ("recv response from game:", message)
             if identity not in self.clients:
                 self.clients.append(identity)
-            self.handler.send_message_to_amp(message.decode())
+            #self.handler.send_message_to_amp(message.decode())
             self.handler.send_message_to_amp(message)
 
     def send(self, message):
@@ -109,7 +107,10 @@ class RallyConnection:
         """
         logging.debug('Sending message to SUT: {msg}'.format(msg=message))
 
+        #print ("send to game:", message)
         if self.clients:
+            print ("send to game:",self.clients[-1], message)
+            
             self.socket.send_multipart([self.clients[-1], message.encode()])
 
         #self.socket.send_string(message)

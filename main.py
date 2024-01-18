@@ -164,7 +164,7 @@ sand_track.enable()
 import sys
 from communication import CommunicationClient, extract_game_state, apply_input
 socket_client = CommunicationClient("rally")
-
+socket_client.send_message(b"gamestart")
 def play():
 
     car.multiplayer = False
