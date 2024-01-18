@@ -96,12 +96,14 @@ class Handler(AbstractHandler):
         logging.debug('Stimulate is called, passing the message to the SUT')
         sd_msg = self._label2message(label)
         sleep(0.5)
+        print ("receive stimulate from amp sd_msg: ", sd_msg)
         self.sut.send(sd_msg)
         sleep(0.5)
-        print ("receive stimulate from amp sd_msg: ", sd_msg)
         identity, message = self.sut.recv()
+        print (identity, message)
+        print ("recv finished")
         self.send_message_to_amp(message)
-
+        #return bytes(sd_msg.encode())
         return bytes(sd_msg, 'UTF-8')
 
     def supported_labels(self):
@@ -121,7 +123,7 @@ class Handler(AbstractHandler):
             _stimulus('forward_left'),
             _stimulus('backward_right'),
             _stimulus('backward_left'),
-            _response('game_state', parameters=[Parameter('state', Type.STRUCT)]),
+            _response('game_state', parameters=[Parameter('coordinates', Type.STRUCT)]),
             # _stimulus('lock', parameters=[Parameter('passcode', Type.INTEGER)]),
         ]
 
@@ -183,10 +185,10 @@ class Handler(AbstractHandler):
         # label_name = message.lower()
         # print(message)
         if message:
-            split_message = message.partition(' ')
-            channel = split_message[0]
-            payload = split_message[2]
-
+        #    split_message = message.partition(' ')
+        #    channel = split_message[0]
+        #    payload = split_message[2]
+            payload = message
             # print(payload)
             json_message = json.loads(payload)
             state = {

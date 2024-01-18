@@ -41,10 +41,10 @@ class RallyConnection:
         logging.info('Opening a socket for the game')
 
         # make a thread
-        #self.wst = threading.Thread(target=self.run_forever)
-        #self.wst.daemon = True
-        #self.wst.start()
-
+#        self.wst = threading.Thread(target=self.run_forever)
+#        self.wst.daemon = True
+#        self.wst.start()
+#
         # self.stream = ZMQStream(self.receive_socket)
         # self.stream.on_recv(self.on_message)
         # print("Connected to the game")
