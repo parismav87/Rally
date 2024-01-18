@@ -15,13 +15,13 @@ def task_back(execution_frame):
     
 def task_left(execution_frame):
     if execution_frame == 0:
-        return 'l'
+        return 'a'
     else:
         return -1
     
 def task_right(execution_frame):
     if execution_frame == 0:
-        return 'r'
+        return 'd'
     else:
         return -1
 
@@ -38,7 +38,10 @@ class CommunicationClient:
         self.execution_frame = 0
         self.send_state_flag = False
         self.name_to_task = {
-            'w' : task_forward
+            'w' : task_forward,
+            's' : task_back,
+            'a' : task_left,
+            'd' : task_right,
         }
         
     def receive(self):
