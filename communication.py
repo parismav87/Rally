@@ -4,8 +4,24 @@ import json
 def task_forward(execution_frame):
     if execution_frame == 0:
         return 'w'
-    elif execution_frame < 10:
-        return None
+    else:
+        return -1
+    
+def task_back(execution_frame):
+    if execution_frame == 0:
+        return 's'
+    else:
+        return -1
+    
+def task_left(execution_frame):
+    if execution_frame == 0:
+        return 'l'
+    else:
+        return -1
+    
+def task_right(execution_frame):
+    if execution_frame == 0:
+        return 'r'
     else:
         return -1
 
