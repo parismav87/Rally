@@ -1,6 +1,15 @@
 import zmq
 import json
 
+def task_forward(execution_frame):
+    if execution_frame == 0:
+        return 'w'
+    elif execution_frame < 10:
+        return None
+    else:
+        return -1
+
+# Really a Task Manager now
 class CommunicationClient:
     def __init__(self, identity = "rally"):
         self.context = zmq.Context()
@@ -9,21 +18,45 @@ class CommunicationClient:
         self.socket.connect("tcp://localhost:7777")
         self.identity = identity
         
+        self.current_task_name = None
+        self.execution_frame = 0
+        self.send_state_flag = False
+        self.name_to_task = {
+            'w' : task_forward
+        }
+        
     def receive(self):
         try:
-            serialized = self.socket.recv_string(flags=zmq.NOBLOCK)
-            print ("recv command: ", serialized)
-            return serialized
+            string = self.socket.recv_string(flags=zmq.NOBLOCK)
+            print ("recv command: ", string)
+            if self.current_task_name is None:
+                self.current_task_name = string
+                self.execution_frame = 0
+            else:
+                print("Something went wrong. I got a new task, but I already have a task :(")
         except zmq.Again as e:
             return None
-        #obj = json.loads(serialized)
-        #return obj
-        # print(obj)
+        return string
+    
+    def task_from_name(self, name):
+        return self.name_to_task[name]
+    
+    def get_key(self):
+        task = self.name_to_task[self.current_task_name]
+        key = task(self.execution_frame)
+        self.execution_frame += 1
+        if key == -1:
+            print("The task is complete")
+            self.current_task_name = None
+            self.execution_frame = 0
+            self.send_state_flag = True
+        return key
         
     def send(self, message = None):
         serialized = json.dumps(message)
-        # print(serialized)
+        print('Sending message: ', serialized)
         self.socket.send_string(self.identity + ' ' + serialized)
+        self.send_state_flag = False
         
 def apply_input(held_keys, external_command):
     if external_command is None:

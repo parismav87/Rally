@@ -39,7 +39,7 @@ class RallyConnection:
         logging.info('Opening a socket for the game')
 
         # make a thread
-        self.wst = threading.Thread(target=self.run_forever)
+        self.wst = threading.Thread(target=self.run_forever_test)
         self.wst.daemon = True
         self.wst.start()
 
@@ -69,7 +69,7 @@ class RallyConnection:
         # print("Can't find main")
         # os.popen('python {}'.format(os.path.join(RALLY_PATH, "main.py")), shell=True)
 
-        def run_forever_test(self):
+    def run_forever_test(self):
         ''' Without AML interaction '''
         while True:
             try:

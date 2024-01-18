@@ -162,13 +162,6 @@ sand_track.enable()
 # Initialize communication
 import sys
 from communication import CommunicationClient, extract_game_state, apply_input
-#assert len(sys.argv) == 3
-#print(sys.argv)
-#receive_port_number = sys.argv[1]
-#send_port_number = sys.argv[2]
-# print(sys.argv)
-# print("Found port number {}".format(port_number))
-#socket_client = CommunicationClient(receive_port_number, send_port_number)
 socket_client = CommunicationClient("rally")
 
 def play():
@@ -248,9 +241,15 @@ def update():
     
     external_command = socket_client.receive()
     if external_command:
-        print('Got the key')
-        print(external_command)
-        apply_input(held_keys, external_command)
+        print('Got the task')
+        print(socket_client.task_from_name(external_command))
+        
+    if socket_client.current_task_name:
+        key = socket_client.get_key()
+        print('Executing task {}, frame {}, key {}'.format(socket_client.current_task_name, socket_client.execution_frame, key))
+        print('Flag', socket_client.send_state_flag)
+        if key != -1:
+            apply_input(held_keys, key)
     
     # If multiplayer, Call the Multiplayer class
     if car.multiplayer:
@@ -285,9 +284,11 @@ def update():
     
     if achievements.time_spent < 10:
         achievements.time_spent += time.dt
-        
-    game_state = extract_game_state(car)
-    socket_client.send(game_state)
+    
+    if socket_client.send_state_flag:
+        print('send_state_flag == True, sending')
+        game_state = extract_game_state(car)
+        socket_client.send(game_state)
         
 def input(key):
     # If multiplayer, send the client's position, rotation, texture, username and highscore to the server
