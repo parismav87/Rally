@@ -45,11 +45,17 @@ class CommunicationClient:
         try:
             string = self.socket.recv_string(flags=zmq.NOBLOCK)
             print ("recv command: ", string)
-            if self.current_task_name is None:
-                self.current_task_name = string
-                self.execution_frame = 0
-            else:
-                print("Something went wrong. I got a new task, but I already have a task :(")
+            
+            if string not in self.name_to_task.keys():
+                print("I don't know this command")
+                return None
+            
+            if self.current_task_name is not None:
+                print("Something went wrong. I got a new task, but I already have a task {} :(".format(self.current_task_name))
+                return None
+        
+            self.current_task_name = string
+            self.execution_frame = 0
         except zmq.Again as e:
             return None
         return string
