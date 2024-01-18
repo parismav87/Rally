@@ -97,7 +97,7 @@ class CommunicationClient:
             #'s' : task_back,
             #'a' : task_left,
             #'d' : task_right,
-            b'go_to' : task_go_to,
+            b'"go_to"' : task_go_to,
             b'RESET' : task_reset
         }
         
