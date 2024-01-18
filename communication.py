@@ -91,7 +91,7 @@ class CommunicationClient:
         self.execution_frame = 0
         self.send_flag = -1
         self.name_to_task = {
-            b'w' : task_forward,
+            b'"w"' : task_forward,
             #'s' : task_back,
             #'a' : task_left,
             #'d' : task_right,
@@ -142,9 +142,9 @@ class CommunicationClient:
             state = extract_game_state(self.car)
             serialized = json.dumps(state)
             print('Sending message: ', serialized)
-            self.socket.send_string(self.identity + ' ' + serialized)
+            self.socket.send_string(serialized)
             self.send_flag = -1
         if self.send_flag == 2:
             # Sending RESET_PERFORMED
-            self.socket.send_string(self.identity + ' ' + 'RESET_PERFORMED')
+            self.socket.send_string('RESET_PERFORMED')
             self.send_flag = -1
