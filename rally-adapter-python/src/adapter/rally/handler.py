@@ -120,6 +120,7 @@ class Handler(AbstractHandler):
             _stimulus('left'),
             _stimulus('forward'),
             _stimulus('back'),
+            _stimulus('go_to'),
             _stimulus('forward_right'),
             _stimulus('forward_left'),
             _stimulus('backward_right'),
