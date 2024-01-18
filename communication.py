@@ -26,8 +26,10 @@ def task_go_to(held_keys, context):
     current_sap = context.par['current_sap']
     held_keys, arrived = go_to_waypoint(context.car, context.saps[current_sap], held_keys, nr_rays=13, check_collision=True)
     if arrived:
-        complete_code = 1
-        response_code = 1
+        context.par['current_sap'] += 1
+        if context.par['current_sap'] == len(context.saps) - 1: 
+            complete_code = 1
+            response_code = 1
     else:
         complete_code = 0
         response_code = 0

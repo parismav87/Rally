@@ -163,7 +163,7 @@ class Handler(AbstractHandler):
             'back': '"s"',
             'left': '"a"',
             'right': '"d"',
-            'forward_left': '"w"',
+            'go_to': '"go_to"',
             'forward_right': '"w"',
             'backward_left': '"s"',
             'backward_right': '"s"',
