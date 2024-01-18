@@ -69,22 +69,36 @@ class RallyConnection:
         # print("Can't find main")
         # os.popen('python {}'.format(os.path.join(RALLY_PATH, "main.py")), shell=True)
 
-    def run_forever(self):
+        def run_forever_test(self):
+        ''' Without AML interaction '''
         while True:
-            #identity, message = self.socket.recv()
-            identity, message = self.socket.recv_multipart()
+            try:
+                identity, message = self.socket.recv_multipart(flags=zmq.NOBLOCK)
+            except zmq.Again as e:
+                identity = b'rally'
+                message = None
             if message:
                 print ("recv response from game:", message)
             if identity not in self.clients:
                 self.clients.append(identity)
-            #echo_msg = "w"
-            #self.socket.send_multipart([identity, echo_msg.encode()])
-            #self.socket.send_string("w")
-            # sleep(2)
-            # print (message)
-           # for client in self.clients:
+            identity = b'rally'
+            echo_msg = "w"
+            print(echo_msg)
+            self.socket.send_multipart([identity, echo_msg.encode()])        
+
+    def run_forever(self):
+        while True:
+            try:
+                identity, message = self.socket.recv_multipart(flags=zmq.NOBLOCK)
+            except zmq.Again as e:
+                identity = b'rally'
+                message = None
+            if message:
+                print ("recv response from game:", message)
+            if identity not in self.clients:
+                self.clients.append(identity)
             self.handler.send_message_to_amp(message.decode())
-            #self.handler.send_message_to_amp(message)
+            self.handler.send_message_to_amp(message)
 
     def send(self, message):
         """
