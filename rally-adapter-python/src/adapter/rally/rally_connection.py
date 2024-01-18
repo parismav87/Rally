@@ -30,7 +30,9 @@ class RallyConnection:
         self.context = zmq.Context()
         self.socket = self.context.socket(zmq.ROUTER)
         self.socket.bind(f'tcp://*:{port_number}')
-        self.clients = []
+        self.clients = [b'rally']
+        self.socket.setsockopt(zmq.RCVTIMEO, 500)
+
 
     def connect(self):
         """
@@ -39,9 +41,9 @@ class RallyConnection:
         logging.info('Opening a socket for the game')
 
         # make a thread
-        self.wst = threading.Thread(target=self.run_forever)
-        self.wst.daemon = True
-        self.wst.start()
+        #self.wst = threading.Thread(target=self.run_forever)
+        #self.wst.daemon = True
+        #self.wst.start()
 
         # self.stream = ZMQStream(self.receive_socket)
         # self.stream.on_recv(self.on_message)
@@ -98,6 +100,10 @@ class RallyConnection:
             #self.handler.send_message_to_amp(message.decode())
             self.handler.send_message_to_amp(message)
 
+    def recv(self,):
+        identity, message = self.socket.recv_multipart()
+        return identity, message
+
     def send(self, message):
         """
         Send a message to the SUT
@@ -108,10 +114,9 @@ class RallyConnection:
         logging.debug('Sending message to SUT: {msg}'.format(msg=message))
 
         #print ("send to game:", message)
-        if self.clients:
-            print ("send to game:",self.clients[-1], message)
-            
-            self.socket.send_multipart([self.clients[-1], message.encode()])
+        print ("send to game:",self.clients[-1], message)
+        
+        self.socket.send_multipart([self.clients[-1], message.encode()])
 
         #self.socket.send_string(message)
         #self.handler.send_message_to_amp(message)

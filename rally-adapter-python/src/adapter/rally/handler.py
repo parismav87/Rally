@@ -95,7 +95,11 @@ class Handler(AbstractHandler):
         logging.debug('Stimulate is called, passing the message to the SUT')
         sd_msg = self._label2message(label)
         self.sut.send(sd_msg)
+        sleep(0.5)
         print ("receive stimulate from amp sd_msg: ", sd_msg)
+        identity, message = self.sut.recv()
+        self.send_message_to_amp(message)
+
         return bytes(sd_msg, 'UTF-8')
 
     def supported_labels(self):

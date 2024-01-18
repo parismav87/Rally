@@ -69,6 +69,7 @@ class CommunicationClient:
         self.socket.setsockopt(zmq.IDENTITY, identity.encode())
         self.socket.connect("tcp://localhost:7777")
         self.identity = identity
+        #self.socket.setsockopt(zmq.RCVTIMEO, 500)
         
         self.current_task_name = None
         self.execution_frame = 0
