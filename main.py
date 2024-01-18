@@ -3,7 +3,6 @@ from direct.stdpy import thread
 
 from car import Car
 from ai import AICar, PathObject
-from goto_controller import go_to_waypoint
 
 from multiplayer import Multiplayer
 from main_menu import MainMenu
@@ -162,9 +161,9 @@ sand_track.enable()
 
 # Initialize communication
 import sys
-from communication import CommunicationClient, extract_game_state, apply_input
-socket_client = CommunicationClient("rally")
-socket_client.send_message(b"gamestart")
+from communication import CommunicationClient
+socket_client = CommunicationClient(car, "rally")
+#socket_client.send_message(b"gamestart")
 def play():
 
     car.multiplayer = False
@@ -243,38 +242,20 @@ sap7 = PathObject((-80, -46, -86), -30)
 sap8 = PathObject((-75, -50, -34), 0)
 saps = [sap1, sap2, sap3, sap4, sap5, sap6, sap7, sap8]
 
-current_sap = 0
-
-
 play()    
 
 def update():
-    global current_sap
-    # Commented for testing
-    # external_command = socket_client.receive()
-    # if external_command:
-    #     print('Got the task')
-    #     print(socket_client.task_from_name(external_command))
-
-    # socket_client.task_from_name('goto', )
-        
-    # if socket_client.current_task_name:
-    #     key = socket_client.get_key()
-    #     print('Executing task {}, frame {}, key {}'.format(socket_client.current_task_name, socket_client.execution_frame, key))
-    #     print('Flag', socket_client.send_flag)
-    #     if key != -1:
-    #         apply_input(held_keys, key)
-
-    # print(held_keys)
-    held_keys['w'] = 0
-    held_keys['a'] = 0
-    held_keys['s'] = 0
-    held_keys['d'] = 0
-    _, arrived = go_to_waypoint(car, saps[current_sap], held_keys, nr_rays=41, check_collision=True)
-    if arrived:
-        current_sap = (current_sap + 1) % len(saps)
-
     
+    #print(held_keys)
+    external_command = socket_client.receive()
+    if external_command:
+        print('Got the task')
+        print(socket_client.task_from_name(external_command))
+        
+    if socket_client.current_task_name:
+        print('Executing task {}, frame {}'.format(socket_client.current_task_name, socket_client.execution_frame))
+        res = socket_client.perform_task(held_keys)
+
     # If multiplayer, Call the Multiplayer class
     if car.multiplayer:
         global multiplayer
@@ -308,10 +289,10 @@ def update():
     
     if achievements.time_spent < 10:
         achievements.time_spent += time.dt
-    #
-    # if socket_client.send_flag != -1:
-    #     print('send_flag == {}, sending'.format(socket_client.send_flag))
-    #     socket_client.send_message(car)
+    
+    if socket_client.send_flag != -1:
+        print('send_flag == {}, sending'.format(socket_client.send_flag))
+        socket_client.send_response()
         
 def input(key):
     # If multiplayer, send the client's position, rotation, texture, username and highscore to the server

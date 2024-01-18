@@ -96,7 +96,8 @@ class RallyConnection:
             if identity not in self.clients:
                 self.clients.append(identity)
             #self.handler.send_message_to_amp(message.decode())
-            self.handler.send_message_to_amp(message)
+            if message:
+                self.handler.send_message_to_amp(message)
 
     def send(self, message):
         """
@@ -105,6 +106,7 @@ class RallyConnection:
         Args:
             message (str): Message to send
         """
+        sleep(0.1)
         logging.debug('Sending message to SUT: {msg}'.format(msg=message))
 
         #print ("send to game:", message)
@@ -113,6 +115,7 @@ class RallyConnection:
             
             self.socket.send_multipart([self.clients[-1], message.encode()])
 
+        sleep(0.1)
         #self.socket.send_string(message)
         #self.handler.send_message_to_amp(message)
 
@@ -174,5 +177,13 @@ class RallyConnection:
 if __name__ == "__main__":
     connection = RallyConnection(None, 7777)
     connection.connect()
-    sleep(50)
+    
+    sleep(5.)
+    connection.send('RESET')
+    
+    sleep(5.)
+    connection.send('w')
+    
+    sleep(5.)
+    connection.send('go_to')
     # connection.stop()

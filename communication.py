@@ -1,33 +1,38 @@
 import zmq
 import json
 
+from ai import AICar, PathObject
+from goto_controller import go_to_waypoint
+
 # Return key + send_flag if the key == -1
-def task_forward(execution_frame):
-    if execution_frame == 0:
-        return 'w', -1
+def task_forward(held_keys, context):
+    if context.execution_frame == 0:
+        held_keys['w'] = 1
+        complete_code = 0
+        response_code = 0
     else:
-        return -1, 1
+        complete_code = 1
+        response_code = 1
+        
+    return held_keys, complete_code, response_code
     
-def task_back(execution_frame):
-    if execution_frame == 0:
-        return 's', -1
+def task_reset(held_keys, context):
+    complete_code = 1
+    response_code = 2
+    
+    return held_keys, complete_code, response_code
+
+def task_go_to(held_keys, context):
+    current_sap = context.par['current_sap']
+    held_keys, arrived = go_to_waypoint(context.car, context.saps[current_sap], held_keys, nr_rays=13, check_collision=True)
+    if arrived:
+        complete_code = 1
+        response_code = 1
     else:
-        return -1, 1
-    
-def task_left(execution_frame):
-    if execution_frame == 0:
-        return 'a', -1
-    else:
-        return -1, 1
-    
-def task_right(execution_frame):
-    if execution_frame == 0:
-        return 'd', -1
-    else:
-        return -1, 1
-    
-def task_reset(execution_frame):
-    return -1, 2
+        complete_code = 0
+        response_code = 0
+        
+    return held_keys, complete_code, response_code
     
 def extract_game_state(car):
     game_state = {
@@ -63,22 +68,35 @@ def extract_game_state(car):
 
 # Really a Task Manager now
 class CommunicationClient:
-    def __init__(self, identity = "rally"):
+    def __init__(self, car, identity = "rally"):
         self.context = zmq.Context()
         self.socket = self.context.socket(zmq.DEALER)
         self.socket.setsockopt(zmq.IDENTITY, identity.encode())
         self.socket.connect("tcp://localhost:7777")
         self.identity = identity
         
+        self.car = car
+        self.sap1 = PathObject((-41, -50, -7), 90)
+        self.sap2 = PathObject((-20, -50, -30), 180)
+        self.sap3 = PathObject((-48, -47, -55), 270)
+        self.sap4 = PathObject((-100, -50, -61), 270)
+        self.sap5 = PathObject((-128, -50, -80), 150)
+        self.sap6 = PathObject((-100, -50, -115), 70)
+        self.sap7 = PathObject((-80, -46, -86), -30)
+        self.sap8 = PathObject((-75, -50, -34), 0)
+        self.saps = [self.sap1, self.sap2, self.sap3, self.sap4, self.sap5, self.sap6, self.sap7, self.sap8]
+        
+        self.par = {'current_sap' : 0}
         self.current_task_name = None
         self.execution_frame = 0
         self.send_flag = -1
         self.name_to_task = {
-            'w' : task_forward,
-            's' : task_back,
-            'a' : task_left,
-            'd' : task_right,
-            'RESET' : task_reset
+            b'w' : task_forward,
+            #'s' : task_back,
+            #'a' : task_left,
+            #'d' : task_right,
+            b'go_to' : task_go_to,
+            b'RESET' : task_reset
         }
         
     def receive(self):
@@ -103,21 +121,25 @@ class CommunicationClient:
     def task_from_name(self, name):
         return self.name_to_task[name]
     
-    def get_key(self):
-        task = self.name_to_task[self.current_task_name]
-        key, send_flg = task(self.execution_frame)
+    def perform_task(self, held_keys):
+        res_keys, complete_code, response_code = self.name_to_task[self.current_task_name](held_keys, self)
         self.execution_frame += 1
-        if key == -1:
-            print("The task is complete")
+        
+        if complete_code == 1:
             self.current_task_name = None
             self.execution_frame = 0
-            self.send_flag = send_flg
-        return key
+            self.send_flag = response_code
+            
+            #if arrived:
+            #self.par['current_sap'] = (self.par['current_sap'] + 1) % len(self.saps)
+            #self.current_task_name = 'go_to'
+            
+        return res_keys
                 
-    def send_message(self, car):
+    def send_response(self):
         if self.send_flag == 1:
             # Sending game state
-            state = extract_game_state(car)
+            state = extract_game_state(self.car)
             serialized = json.dumps(state)
             print('Sending message: ', serialized)
             self.socket.send_string(self.identity + ' ' + serialized)
@@ -126,9 +148,3 @@ class CommunicationClient:
             # Sending RESET_PERFORMED
             self.socket.send_string(self.identity + ' ' + 'RESET_PERFORMED')
             self.send_flag = -1
-        
-def apply_input(held_keys, external_command):
-    if external_command is None:
-        return held_keys
-    held_keys[external_command] = 1
-    return held_keys
