@@ -102,9 +102,10 @@ class Handler(AbstractHandler):
         identity, message = self.sut.recv()
         print (identity, message)
         print ("recv finished")
-        self.send_message_to_amp(message)
-        #return bytes(sd_msg.encode())
+        self.send_message_to_amp(message.decode())
         return bytes(sd_msg, 'UTF-8')
+        #return b'w'
+        #return bytes('w', 'UTF-8')
 
     def supported_labels(self):
         """
@@ -183,13 +184,12 @@ class Handler(AbstractHandler):
         """
 
         # label_name = message.lower()
-        # print(message)
+        print("$$$$$$$:", message)
         if message:
-        #    split_message = message.partition(' ')
-        #    channel = split_message[0]
-        #    payload = split_message[2]
-            payload = message
-            # print(payload)
+            split_message = message.partition(' ')
+            channel = split_message[0]
+            payload = split_message[2]
+            print("send payload:", payload)
             json_message = json.loads(payload)
             state = {
                 'coordinates': {
@@ -205,7 +205,7 @@ class Handler(AbstractHandler):
                 name='game_state',
                 channel=channel,
                 parameters=[Parameter('state', Type.HASH, state)],
-                physical_label=bytes(message, 'UTF-8'),
+                physical_label=bytes(payload, 'UTF-8'),
                 timestamp=datetime.now())
         else:
             label = None
