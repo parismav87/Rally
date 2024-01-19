@@ -31,7 +31,9 @@ class RallyConnection:
         self.socket = self.context.socket(zmq.ROUTER)
         self.socket.bind(f'tcp://*:{port_number}')
         self.clients = [b'rally']
-        self.socket.setsockopt(zmq.RCVTIMEO, 500)
+        #self.socket.setsockopt(zmq.RCVTIMEO, 500)
+        self.socket.setsockopt(zmq.RCVTIMEO, -1)
+
 
 
     def connect(self):

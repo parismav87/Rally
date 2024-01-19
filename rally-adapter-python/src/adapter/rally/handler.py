@@ -95,10 +95,10 @@ class Handler(AbstractHandler):
         """
         logging.debug('Stimulate is called, passing the message to the SUT')
         sd_msg = self._label2message(label)
-        sleep(0.5)
+        sleep(0.2)
         print ("receive stimulate from amp sd_msg: ", sd_msg)
         self.sut.send(sd_msg)
-        sleep(0.5)
+        sleep(0.2)
         identity, message = self.sut.recv()
         print (identity, message)
         print ("recv finished")
@@ -185,7 +185,6 @@ class Handler(AbstractHandler):
         """
 
         # label_name = message.lower()
-        # print("$$$$$$$:", message)
         if message:
             if 'rally' in message:
                 split_message = message.partition(' ')
@@ -194,7 +193,6 @@ class Handler(AbstractHandler):
             else:
                 channel = b'rally'
                 payload = message
-    
             print("send payload:", payload)
             json_message = json.loads(payload)
             state = {
