@@ -185,11 +185,16 @@ class Handler(AbstractHandler):
         """
 
         # label_name = message.lower()
-        print("$$$$$$$:", message)
+        # print("$$$$$$$:", message)
         if message:
-            split_message = message.partition(' ')
-            channel = split_message[0]
-            payload = split_message[2]
+            if 'rally' in message:
+                split_message = message.partition(' ')
+                channel = split_message[0]
+                payload = split_message[2]
+            else:
+                channel = b'rally'
+                payload = message
+    
             print("send payload:", payload)
             json_message = json.loads(payload)
             state = {
